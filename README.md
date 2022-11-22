@@ -7,4 +7,4 @@ Composed of
 
 
 Schematics :
-![alt tag](https://user-images.githubusercontent.com/31324055/130589754-dc2da2e0-f366-434d-aad8-24c96b2bab09.png)
+![alt tag](https://user-images.githubusercontent.com/31324055/203373092-412b558a-9bb3-45fa-a823-e6bdf61e33ea.jpg)
