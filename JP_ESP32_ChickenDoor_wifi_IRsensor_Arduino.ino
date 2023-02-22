@@ -20,11 +20,11 @@
 
 // motor driver
 #include <ESP32MX1508.h> //https://github.com/ElectroMagus/ESP32MX1508
-#define IN1_PIN  15
+#define IN1_PIN  2
 #define IN2_PIN  13
 #define IN3_PIN  4
 #define IN4_PIN  16
-#define CH1 0                   // 16 Channels (0-15) are availible
+#define CH1 0                   // 16 Channels (0-15) are available
 #define CH2 1                   // Make sure each pin is a different channel and not in use by other PWM devices (servos, LED's, etc)
 
 // Optional Parameters
@@ -140,7 +140,7 @@ unsigned long timeout = 0;
 boolean touchWake = false;
 boolean resetWake = false;
 touch_pad_t touchPin;
-int threshold = 40;
+int threshold = 45; //Threshold value for touchpads pins
 
 #define uS_TO_S_FACTOR 1000000ULL  /* Conversion factor for micro seconds to seconds */
 int timeToSleep = 20  ;            /* Time ESP32 will go to sleep (in seconds) */
@@ -243,8 +243,8 @@ void print_wakeup_touchpad() {
     case 5  : Serial.println("Touch detected on GPIO 12"); break;
     case 6  : Serial.println("Touch detected on GPIO 14"); break;
     case 7  : Serial.println("Touch detected on GPIO 27"); break;
-    case 8  : Serial.println("T9 detected --> opening"); chickenStatus = opening; break;  //GPIO33
-    case 9  : Serial.println("T8 detected --> closing"); chickenStatus = closing; break;  //GPIO32
+    case 8  : Serial.println("T9 detected --> closing"); chickenStatus = closing; break;  //GPIO32
+    case 9  : Serial.println("T8 detected --> opening"); chickenStatus = opening; break;  //GPIO33
     default : Serial.println("Wakeup not by touchpad"); break;
   }
 }
@@ -436,7 +436,7 @@ void IRAM_ATTR optical_ISR()    //IR sensor interrupt routine
     IRtimeout = millis();
     if (chickenStatus == opening) tops++;
     else tops--;
-    Serial.println( tops);
+    //Serial.println( tops);
   }
 }
 
@@ -943,7 +943,7 @@ void loop()
             if (touchRead(T6) > threshold)  //once again to be sure
             {
               calibrating = false;
-              topMax = max(5,tops);                                //current position is topMax
+              topMax = max(5, tops);                               //current position is topMax
               preferences.putInt("topMax", topMax);         //save it
               Serial.println("saving topMax");
             }
@@ -951,6 +951,11 @@ void loop()
         }
         motorB.motorGo(255);            // Pass the speed to the motor: 0-255 for 8 bit resolution;
         timeout = millis();
+        if ((millis() - IRtimeout) > 1200)
+        {
+          Serial.print("motion blocked at position ");
+          Serial.println(tops);
+        }
       }
       else
       {
@@ -976,6 +981,11 @@ void loop()
       {
         motorB.motorRev(255);            // Pass the speed to the motor: 0-255 for 8 bit resolution;
         timeout = millis();
+        if ((millis() - IRtimeout) > 1200)
+        {
+          Serial.print("motion blocked at position ");
+          Serial.println(tops);
+        }
       }
       else
       {
