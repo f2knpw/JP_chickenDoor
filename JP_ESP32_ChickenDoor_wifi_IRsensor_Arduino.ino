@@ -436,6 +436,7 @@ void IRAM_ATTR optical_ISR()    //IR sensor interrupt routine
     IRtimeout = millis();
     if (chickenStatus == opening) tops++;
     else tops--;
+    if (tops < 0) tops = 0;
     //Serial.println( tops);
   }
 }
@@ -951,7 +952,7 @@ void loop()
         }
         motorB.motorGo(255);            // Pass the speed to the motor: 0-255 for 8 bit resolution;
         timeout = millis();
-        if ((millis() - IRtimeout) > 1200)
+        if ((millis() - IRtimeout) > 10000)
         {
           Serial.print("motion blocked at position ");
           Serial.println(tops);
@@ -981,7 +982,7 @@ void loop()
       {
         motorB.motorRev(255);            // Pass the speed to the motor: 0-255 for 8 bit resolution;
         timeout = millis();
-        if ((millis() - IRtimeout) > 1200)
+        if ((millis() - IRtimeout) > 10000)
         {
           Serial.print("motion blocked at position ");
           Serial.println(tops);
